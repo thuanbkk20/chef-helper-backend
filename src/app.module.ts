@@ -8,6 +8,8 @@ import {
 } from 'typeorm-transactional';
 import { SharedModule } from './shared/shared.module';
 import { ApiConfigService } from './shared/services/api-config.service';
+import { UserModule } from '@modules/users/user.module';
+import { AuthModule } from '@modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { ApiConfigService } from './shared/services/api-config.service';
         return Promise.resolve(dataSource);
       },
     }),
+    UserModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

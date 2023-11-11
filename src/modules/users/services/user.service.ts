@@ -13,6 +13,7 @@ export class UserService {
   }
 
   async registerUser(registerDto: UserRegisterDto): Promise<UserEntity> {
+    console.log('aaaa');
     try {
       const user = await this.userRepository.insert({
         ...registerDto,
