@@ -16,6 +16,24 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@test/*": [
+        "./test/*"
+      ],
+      "@modules/*": [
+        "./src/modules/*"
+      ],
+      "@/*": [
+        "./src/*"
+      ],
+    }
+  },
+  "include": [
+    "src/**/*"
+, "ormconfig.ts"  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
 }
