@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import type { ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 import { ORDER } from '../constants';
 
@@ -10,6 +10,7 @@ import type { PageCursorDto } from './dtos/page-cursor.dto';
  * @returns {string}
  */
 export function generateHash(password: string): string {
+  console.log('hash password');
   return bcrypt.hashSync(password, 10);
 }
 
@@ -27,7 +28,7 @@ export function validateHash(
     return Promise.resolve(false);
   }
 
-  return bcrypt.compare(password, hash);
+  return bcrypt.compareSync(password, hash);
 }
 
 export function getVariableName<TResult>(getVar: () => TResult): string {

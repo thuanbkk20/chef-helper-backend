@@ -1,15 +1,24 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 import { SharedModule } from './shared/shared.module';
 import { ApiConfigService } from './shared/services/api-config.service';
 import { setupSwagger } from './setup-swagger';
+import { ClassSerializerInterceptor } from '@nestjs/common';
+import { SerializerInterceptor } from './interceptors/serializer-interceptor';
 
 async function bootstrap() {
   initializeTransactionalContext();
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('/api/v1');
   const configService = app.select(SharedModule).get(ApiConfigService);
+
+  const reflector = app.get(Reflector);
+
+  app.useGlobalInterceptors(
+    new ClassSerializerInterceptor(reflector),
+    new SerializerInterceptor(),
+  );
 
   if (configService.documentationEnabled) {
     setupSwagger(app);
