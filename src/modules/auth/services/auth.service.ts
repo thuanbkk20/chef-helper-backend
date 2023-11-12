@@ -1,7 +1,9 @@
 import { UserRegisterDto } from '@modules/users/domains/dtos/user-register.dto';
 import { UserService } from '@modules/users/services/user.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { LoginDto } from '../domains/dtos/login.dto';
+import { validateHash } from '@/common/utils';
 
 @Injectable()
 export class AuthService {
@@ -12,12 +14,28 @@ export class AuthService {
 
   async userRegister(registerDto: UserRegisterDto): Promise<any> {
     const user = await this.userService.registerUser(registerDto);
-    console.log(user);
     return {
       accessToken: await this.jwtService.signAsync({
         id: user.id,
-        // id: 1,
       }),
     };
+  }
+
+  async userLogin(loginDto: LoginDto): Promise<any> {
+    const user = await this.userService.findUserByEmailOrUserName(
+      loginDto.userName,
+    );
+    if (user != null) {
+      const isPasswordMatch = validateHash(loginDto.password, user.password);
+      if (!isPasswordMatch) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+      return {
+        accessToken: await this.jwtService.signAsync({
+          id: user.id,
+        }),
+      };
+    }
+    throw new UnauthorizedException('Username not found');
   }
 }

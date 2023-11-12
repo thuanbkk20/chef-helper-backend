@@ -10,7 +10,6 @@ import type { PageCursorDto } from './dtos/page-cursor.dto';
  * @returns {string}
  */
 export function generateHash(password: string): string {
-  console.log('hash password');
   return bcrypt.hashSync(password, 10);
 }
 

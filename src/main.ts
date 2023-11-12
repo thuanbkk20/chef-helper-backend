@@ -6,10 +6,19 @@ import { ApiConfigService } from './shared/services/api-config.service';
 import { setupSwagger } from './setup-swagger';
 import { ClassSerializerInterceptor } from '@nestjs/common';
 import { SerializerInterceptor } from './interceptors/serializer-interceptor';
+import { middleware as expressCtx } from 'express-ctx';
+import {
+  ExpressAdapter,
+  NestExpressApplication,
+} from '@nestjs/platform-express';
 
 async function bootstrap() {
   initializeTransactionalContext();
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+    new ExpressAdapter(),
+    { cors: true },
+  );
   app.setGlobalPrefix('/api/v1');
   const configService = app.select(SharedModule).get(ApiConfigService);
 
@@ -19,6 +28,8 @@ async function bootstrap() {
     new ClassSerializerInterceptor(reflector),
     new SerializerInterceptor(),
   );
+
+  app.use(expressCtx);
 
   if (configService.documentationEnabled) {
     setupSwagger(app);
