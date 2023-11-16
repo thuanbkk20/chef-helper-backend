@@ -34,9 +34,9 @@ export class RecipeEntity extends AbstractEntity {
   @Column('jsonb', { nullable: false, default: {} })
   guide: string;
 
-  @OneToOne(() => CategoryEntity)
-  @JoinColumn({ name: 'category_id' })
-  category: CategoryEntity;
+  @ManyToMany(() => CategoryEntity)
+  @JoinTable({ name: 'recipe_category' })
+  categories: CategoryEntity[];
 
   @OneToOne(() => UserEntity)
   @JoinColumn({ name: 'uploader_id' })
