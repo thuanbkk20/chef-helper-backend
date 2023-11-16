@@ -1,5 +1,6 @@
+import { RecipeEntity } from './../../../recipes/domains/entities/recipe.entity';
 import { AbstractEntity } from '../../../../common/abstract.entity';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 
 @Entity('users')
 export class UserEntity extends AbstractEntity {
@@ -26,4 +27,8 @@ export class UserEntity extends AbstractEntity {
 
   @Column({ nullable: true })
   fullName: string;
+
+  @ManyToMany(() => RecipeEntity)
+  @JoinTable({ name: 'bookmarked_recipes' })
+  bookmarkedRecipes: RecipeEntity[];
 }
