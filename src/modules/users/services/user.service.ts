@@ -3,6 +3,7 @@ import { UserRepository } from '../repositories/user.repository';
 import { UserEntity } from '../domains/entities/user.entity';
 import { UserRegisterDto } from '../domains/dtos/user-register.dto';
 import { generateHash } from 'src/common/utils';
+import { GoogleSignInDto } from '../../auth/domains/dtos/google-sign-in.dto';
 
 @Injectable()
 export class UserService {
@@ -35,5 +36,22 @@ export class UserService {
       userName: input,
     });
     return userByUserName != null ? userByUserName : userByEmail;
+  }
+
+  async findByRequiredInfo(findOptions: object): Promise<UserEntity | null> {
+    return await this.userRepository.findOneBy(findOptions);
+  }
+
+  async registerByGoogle(registerDto: GoogleSignInDto): Promise<UserEntity> {
+    try {
+      const user = await this.userRepository.insert({
+        ...registerDto,
+        password: generateHash(registerDto.password),
+      });
+
+      return user.raw[0];
+    } catch (error) {
+      throw new BadRequestException();
+    }
   }
 }

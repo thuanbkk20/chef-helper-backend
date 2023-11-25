@@ -1,10 +1,11 @@
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './../services/auth.service';
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { UserRegisterDto } from '@modules/users/domains/dtos/user-register.dto';
 import { LoginDto } from '../domains/dtos/login.dto';
 import { ContextProvider } from '@/providers/context.provider';
 import { Auth } from '@/decorators/http.decorators';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -25,5 +26,11 @@ export class AuthController {
   @Get('profile')
   getProfile() {
     return ContextProvider.getAuthUser();
+  }
+
+  @Get('/google/callback')
+  @UseGuards(AuthGuard('google'))
+  googleAuthRedirect(@Req() req) {
+    return this.authService.googleLogin(req);
   }
 }

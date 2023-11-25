@@ -4,6 +4,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from '../domains/dtos/login.dto';
 import { validateHash } from '@/common/utils';
+import { OAuthException } from '../../../exceptions/oauth.exception';
+import { GoogleSignInDto } from '../domains/dtos/google-sign-in.dto';
 
 @Injectable()
 export class AuthService {
@@ -37,5 +39,42 @@ export class AuthService {
       };
     }
     throw new UnauthorizedException('Username not found');
+  }
+
+  async userRegisterByGoogle(registerDto: GoogleSignInDto) {
+    const user = await this.userService.registerByGoogle(registerDto);
+    return {
+      accessToken: await this.jwtService.signAsync({
+        id: user.id,
+      }),
+    };
+  }
+
+  async googleLogin(req: any) {
+    if (!req.user) {
+      throw new OAuthException();
+    }
+    // Find if user exist in application
+    const userInApp = await this.userService.findByRequiredInfo({
+      userName: req.user.email,
+    });
+
+    if (userInApp === null) {
+      const user = {
+        userName: req.user.email,
+        email: req.user.email,
+        fullName: req.user.lastName + ' ' + req.user.firstName,
+        password: req.user.email,
+        avatar: req.user.picture,
+      };
+      return this.userRegisterByGoogle(user);
+    } else {
+      const payload = {
+        id: userInApp.id,
+      };
+      return {
+        accessToken: await this.jwtService.signAsync(payload),
+      };
+    }
   }
 }
