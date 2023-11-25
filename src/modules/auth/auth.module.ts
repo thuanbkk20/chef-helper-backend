@@ -5,6 +5,7 @@ import { UserModule } from '@modules/users/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { config } from 'dotenv';
+import { GoogleStrategy } from './strategies/google.stategy';
 
 config();
 const configService = new ConfigService();
@@ -20,7 +21,7 @@ const configService = new ConfigService();
       },
     }),
   ],
-  providers: [AuthService],
+  providers: [AuthService, GoogleStrategy],
   exports: [AuthService],
   controllers: [AuthController],
 })
