@@ -9,6 +9,9 @@ export const ERROR_UNIQUE_EMAIL = 'error.unique.email';
 export const ERROR_USER_CONFLICT = 'error.userConflict';
 export const ERROR_DATA_CONFLICT = 'error.dataConflict';
 
+// Recipe Module error messages
+export const ERROR_RECIPE_NOT_FOUND = 'error.recipeNotFound';
+
 // Error refreshToken expired
 export const ERROR_REFRESH_TOKEN_EXPIRED = 'error.refreshTokenExpired';
 

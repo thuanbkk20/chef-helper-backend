@@ -8,7 +8,7 @@ import {
   JoinColumn,
   JoinTable,
   ManyToMany,
-  OneToOne,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity('recipes')
@@ -28,17 +28,17 @@ export class RecipeEntity extends AbstractEntity {
   @Column('simple-array')
   images: string[];
 
-  @Column('simple-array')
-  spices: string[];
-
   @Column('jsonb', { nullable: false, default: {} })
   guide: string;
+
+  @Column()
+  isDraft: boolean;
 
   @ManyToMany(() => CategoryEntity)
   @JoinTable({ name: 'recipe_category' })
   categories: CategoryEntity[];
 
-  @OneToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn({ name: 'uploader_id' })
   uploader: UserEntity;
 
