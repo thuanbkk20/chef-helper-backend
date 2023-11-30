@@ -10,6 +10,9 @@ import { SharedModule } from './shared/shared.module';
 import { ApiConfigService } from './shared/services/api-config.service';
 import { UserModule } from '@modules/users/user.module';
 import { AuthModule } from '@modules/auth/auth.module';
+import { RecipeModule } from './modules/recipes/recipe.module';
+import { IngredientModule } from './modules/ingredients/ingredient.module';
+import { CategoryModule } from './modules/categories/category.module';
 
 @Module({
   imports: [
@@ -37,6 +40,9 @@ import { AuthModule } from '@modules/auth/auth.module';
     }),
     UserModule,
     AuthModule,
+    RecipeModule,
+    IngredientModule,
+    CategoryModule,
   ],
 })
 export class AppModule {}
