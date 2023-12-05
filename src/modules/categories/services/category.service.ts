@@ -6,6 +6,10 @@ import { CategoryRepository } from '../repositories/category.repository';
 export class CategoryService {
   constructor(private readonly categoryRepository: CategoryRepository) {}
 
+  async findOneById(id: number): Promise<CategoryEntity> {
+    return this.categoryRepository.findOneBy({ id: id });
+  }
+
   async getAllCategories(): Promise<CategoryEntity[]> {
     return this.categoryRepository.find();
   }
