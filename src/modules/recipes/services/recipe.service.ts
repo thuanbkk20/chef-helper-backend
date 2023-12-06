@@ -1,12 +1,18 @@
 import { UserService } from './../../users/services/user.service';
 import { IngredientService } from './../../ingredients/services/ingredient.service';
 import { CategoryService } from './../../categories/services/category.service';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateRecipeDto, RecipeDto } from '../domains/dtos/recipe.dto';
 import { RecipeRepository } from '../repositories/recipe.repository';
 import { RecipeNotFoundException } from '../../../exceptions/recipe-not-found.exception';
 import { RecipeEntity } from '../domains/entities/recipe.entity';
 import { RecipeQueryDto } from '../domains/dtos/recipe-query.dto';
+import { ContextProvider } from '../../../providers';
+import { BookmarkDto } from '../domains/dtos/bookmark.dto';
 
 @Injectable()
 export class RecipeService {
@@ -23,7 +29,6 @@ export class RecipeService {
 
   async findOneById(id: number): Promise<RecipeDto> {
     const recipe = await this.recipeRepository.findOneById(id);
-    console.log(recipe);
     if (recipe === null) {
       throw new RecipeNotFoundException();
     }
@@ -32,7 +37,6 @@ export class RecipeService {
 
   async createNewRecipe(recipe: CreateRecipeDto): Promise<RecipeEntity> {
     const categories = await this.categoryService.getManyByIds(recipe.category);
-    console.log('aaaa');
     const ingredients = await this.ingredientService.getManyByIds(
       recipe.ingredients,
     );
@@ -45,7 +49,6 @@ export class RecipeService {
       categories: categories,
       ingredients: ingredients,
     };
-    console.log(recipeToCreate);
     const returnRecipe = await this.recipeRepository.save(recipeToCreate);
     return returnRecipe;
   }
@@ -70,5 +73,37 @@ export class RecipeService {
     const recipes = await this.getAll();
     const recipeDtos = recipes.map((recipe) => new RecipeDto(recipe));
     return recipeDtos;
+  }
+
+  async bookmarkRecipe(bookmarkDto: BookmarkDto): Promise<string> {
+    const authUser = ContextProvider.getAuthUser();
+    if (authUser.id != bookmarkDto.userId) {
+      throw new UnauthorizedException();
+    }
+    //
+    const recipe = await this.recipeRepository.findOneById(
+      bookmarkDto.recipeId,
+    );
+    if (recipe == null) {
+      throw new RecipeNotFoundException();
+    }
+    const userBookmarkedRecipes =
+      await this.userService.getUserBookmarkedRecipes(bookmarkDto.userId);
+    // Remove the recipe if it is in the userBookmarkedRecipes, otherwise, add it into userBookmarkedRecipes
+    const index = userBookmarkedRecipes.findIndex(
+      (bookmarkedRecipe) => bookmarkedRecipe.id === recipe.id,
+    );
+    let message = 'Bookmark this recipe successfully';
+    if (index !== -1) {
+      // Element exists, remove it
+      userBookmarkedRecipes.splice(index, 1);
+      message = 'Unbookmark this recipe successfully';
+    } else {
+      // Element doesn't exist, add it
+      userBookmarkedRecipes.push(recipe);
+    }
+    authUser.bookmarkedRecipes = userBookmarkedRecipes;
+    this.userService.saveUser(authUser);
+    return message;
   }
 }
