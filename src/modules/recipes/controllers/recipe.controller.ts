@@ -3,6 +3,8 @@ import { ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { RecipeService } from '../services/recipe.service';
 import { CreateRecipeDto, RecipeDto } from '../domains/dtos/recipe.dto';
 import { RecipeQueryDto } from '../domains/dtos/recipe-query.dto';
+import { Auth } from '../../../decorators/http.decorators';
+import { BookmarkDto } from '../domains/dtos/bookmark.dto';
 
 @Controller('recipe')
 @ApiTags('recipe')
@@ -16,6 +18,16 @@ export class RecipeController {
   })
   async getRecipeById(@Param('id') id: number): Promise<RecipeDto> {
     return this.recipeService.findOneById(id);
+  }
+
+  @Auth()
+  @Post('/bookmark')
+  @ApiOkResponse({
+    description: 'Bookmark recipe',
+    type: String,
+  })
+  async bookmarkRecipe(@Body() bookmarkDto: BookmarkDto): Promise<string> {
+    return this.recipeService.bookmarkRecipe(bookmarkDto);
   }
 
   @Get()

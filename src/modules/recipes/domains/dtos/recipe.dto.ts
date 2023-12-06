@@ -50,7 +50,6 @@ export class RecipeDto extends CreateRecipeDto {
   id: number;
 
   constructor(recipe: RecipeEntity) {
-    console.log(recipe.categories);
     super();
     this.id = recipe.id;
     this.name = recipe.name;
