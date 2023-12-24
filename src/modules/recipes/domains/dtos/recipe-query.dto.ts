@@ -6,4 +6,7 @@ export class RecipeQueryDto {
 
   @ApiPropertyOptional()
   isCommon?: boolean;
+
+  @ApiPropertyOptional()
+  search?: string;
 }

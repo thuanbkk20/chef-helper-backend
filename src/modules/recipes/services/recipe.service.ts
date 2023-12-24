@@ -64,13 +64,7 @@ export class RecipeService {
   }
 
   async findManyByOption(queryOption: RecipeQueryDto): Promise<RecipeDto[]> {
-    if (queryOption.isCommon) {
-      return [];
-    }
-    if (queryOption.categoryId) {
-      return this.getRecipesByCategory(queryOption.categoryId);
-    }
-    const recipes = await this.getAll();
+    const recipes = await this.recipeRepository.findManyByOption(queryOption);
     const recipeDtos = recipes.map((recipe) => new RecipeDto(recipe));
     return recipeDtos;
   }
