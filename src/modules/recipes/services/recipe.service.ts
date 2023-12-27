@@ -100,4 +100,21 @@ export class RecipeService {
     this.userService.saveUser(authUser);
     return message;
   }
+
+  async findManyByIngredients(ids: number[]): Promise<RecipeDto[]> {
+    ids = typeof ids === 'string' ? [ids] : ids;
+    ids = ids.map((id) => Number(id));
+    const allRecipes = await this.recipeRepository.findAll();
+    //Loop through allRecipes to filter recipes that match the requirement
+    const matchedRecipe = allRecipes.filter((recipe) => {
+      const recipeIngredientIds = recipe.ingredients.map(
+        (ingredient) => ingredient.id,
+      );
+      console.log('recipe ingredient id: ', recipeIngredientIds);
+      console.log('ids:', ids);
+      return recipeIngredientIds.every((id) => ids.includes(id));
+    });
+    const recipeDtos = matchedRecipe.map((recipe) => new RecipeDto(recipe));
+    return recipeDtos;
+  }
 }
