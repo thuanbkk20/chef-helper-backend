@@ -11,6 +11,7 @@ import {
   ExpressAdapter,
   NestExpressApplication,
 } from '@nestjs/platform-express';
+import * as express from 'express';
 
 async function bootstrap() {
   initializeTransactionalContext();
@@ -30,6 +31,8 @@ async function bootstrap() {
   );
 
   app.use(expressCtx);
+  // Serve uploaded files statically
+  app.use('/uploads', express.static('uploads'));
 
   if (configService.documentationEnabled) {
     setupSwagger(app);

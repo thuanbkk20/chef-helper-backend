@@ -13,6 +13,7 @@ import { AuthModule } from '@modules/auth/auth.module';
 import { RecipeModule } from './modules/recipes/recipe.module';
 import { IngredientModule } from './modules/ingredients/ingredient.module';
 import { CategoryModule } from './modules/categories/category.module';
+import { FileModule } from './modules/file/file.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { CategoryModule } from './modules/categories/category.module';
     RecipeModule,
     IngredientModule,
     CategoryModule,
+    FileModule,
   ],
 })
 export class AppModule {}
