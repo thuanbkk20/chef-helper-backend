@@ -52,4 +52,13 @@ export class RecipeRepository extends Repository<RecipeEntity> {
     }
     return query.getMany();
   }
+
+  async getUserUploadedRecipes(userId: number): Promise<RecipeEntity[]> {
+    const query = this.createQueryBuilder('recipe')
+      .leftJoinAndSelect('recipe.categories', 'category')
+      .leftJoinAndSelect('recipe.uploader', 'uploader')
+      .leftJoinAndSelect('recipe.ingredients', 'ingredients')
+      .where('uploader.id = :id', { id: userId });
+    return query.getMany();
+  }
 }
