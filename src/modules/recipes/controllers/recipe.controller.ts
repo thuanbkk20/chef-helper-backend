@@ -33,6 +33,17 @@ export class RecipeController {
     return this.recipeService.findManyByIngredients(ingredientIds.ids);
   }
 
+  @Get('/uploaded-by/:id')
+  @ApiOkResponse({
+    description: 'Successfully get recipes uploaded by user',
+    type: [RecipeDto],
+  })
+  async getRecipesUploadedByUser(
+    @Param('id') id: number,
+  ): Promise<RecipeDto[]> {
+    return this.recipeService.getUserUploadedRecipeDtos(id);
+  }
+
   @Get(':id')
   @ApiOkResponse({
     description: 'Successfully get recipes',

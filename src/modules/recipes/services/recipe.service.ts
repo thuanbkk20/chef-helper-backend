@@ -117,4 +117,14 @@ export class RecipeService {
     const recipeDtos = matchedRecipe.map((recipe) => new RecipeDto(recipe));
     return recipeDtos;
   }
+
+  async getUserUploadedRecipeDtos(userId: number): Promise<RecipeDto[]> {
+    const recipes: RecipeEntity[] =
+      await this.recipeRepository.getUserUploadedRecipes(userId);
+    const recipeDtos = recipes.map((recipe) => {
+      console.log(recipe);
+      return new RecipeDto(recipe);
+    });
+    return recipeDtos;
+  }
 }
