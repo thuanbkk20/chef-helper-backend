@@ -1,21 +1,27 @@
+import { UserEntity } from './../domains/entities/user.entity';
 import {
   BadRequestException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
-import { UserEntity } from '../domains/entities/user.entity';
 import { UserRegisterDto } from '../domains/dtos/user-register.dto';
-import { generateHash } from 'src/common/utils';
+import { generateHash, validateHash } from 'src/common/utils';
 import { GoogleSignInDto } from '../../auth/domains/dtos/google-sign-in.dto';
 import { RecipeEntity } from '../../recipes/domains/entities/recipe.entity';
 import { UserNotFoundException } from '../../../exceptions/user-not-found.exception';
 import { RecipeDto } from '../../recipes/domains/dtos/recipe.dto';
 import { ContextProvider } from '../../../providers';
+import { ChangePasswordDto } from '../domains/dtos/change-password.dto';
+import { JwtService } from '@nestjs/jwt';
+import { PatchAPIResponseDto } from '../domains/dtos/patch-api-response.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async getAllUsers(): Promise<UserEntity[]> {
     return this.userRepository.find();
@@ -93,5 +99,30 @@ export class UserService {
 
   async saveUser(user: UserEntity): Promise<UserEntity> {
     return this.userRepository.save(user);
+  }
+
+  async changePassword(
+    changePassworDto: ChangePasswordDto,
+  ): Promise<PatchAPIResponseDto> {
+    if (changePassworDto.currentPassword === changePassworDto.newPassword) {
+      throw new BadRequestException(
+        'New password must be different from the old one',
+      );
+    }
+    const user = ContextProvider.getAuthUser();
+    const userEntity = await this.findByRequiredInfo({ id: user.id });
+    console.log(userEntity.password);
+    if (user != null) {
+      const isPasswordMatch = validateHash(
+        changePassworDto.currentPassword,
+        userEntity.password,
+      );
+      if (!isPasswordMatch) {
+        throw new UnauthorizedException('Wrong password');
+      }
+      userEntity.password = generateHash(changePassworDto.newPassword);
+      this.userRepository.save(userEntity);
+      return { message: 'Change password successfully!' };
+    }
   }
 }
