@@ -13,6 +13,9 @@ import { RecipeEntity } from '../domains/entities/recipe.entity';
 import { RecipeQueryDto } from '../domains/dtos/recipe-query.dto';
 import { ContextProvider } from '../../../providers';
 import { BookmarkDto } from '../domains/dtos/bookmark.dto';
+import { RecipePageOptionsDto } from '../domains/dtos/recipe-page-options.dto';
+import { PageDto } from '../../../common/dtos/page.dto';
+import { PageMetaDto } from '../../../common/dtos/page-meta.dto';
 
 @Injectable()
 export class RecipeService {
@@ -61,6 +64,19 @@ export class RecipeService {
     const recipes = await this.recipeRepository.findManyByCategoryId(id);
     const recipeDtos = recipes.map((recipe) => new RecipeDto(recipe));
     return recipeDtos;
+  }
+
+  async getRecipePage(
+    pageOptionsDto: RecipePageOptionsDto,
+  ): Promise<PageDto<RecipeDto>> {
+    const recipeResponse =
+      await this.recipeRepository.getRecipePage(pageOptionsDto);
+    const recipeRecords = recipeResponse.entities.map(
+      (recipe) => new RecipeDto(recipe),
+    );
+    const itemCount = recipeResponse.itemCount;
+    const pageMeta = new PageMetaDto({ pageOptionsDto, itemCount });
+    return new PageDto(recipeRecords, pageMeta);
   }
 
   async findManyByOption(queryOption: RecipeQueryDto): Promise<RecipeDto[]> {
