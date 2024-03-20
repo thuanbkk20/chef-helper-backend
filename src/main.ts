@@ -4,7 +4,7 @@ import { initializeTransactionalContext } from 'typeorm-transactional';
 import { SharedModule } from './shared/shared.module';
 import { ApiConfigService } from './shared/services/api-config.service';
 import { setupSwagger } from './setup-swagger';
-import { ClassSerializerInterceptor } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { SerializerInterceptor } from './interceptors/serializer-interceptor';
 import { middleware as expressCtx } from 'express-ctx';
 import {
@@ -33,7 +33,7 @@ async function bootstrap() {
   app.use(expressCtx);
   // Serve uploaded files statically
   app.use('/uploads', express.static('uploads'));
-
+  app.useGlobalPipes(new ValidationPipe());
   if (configService.documentationEnabled) {
     setupSwagger(app);
   }
