@@ -15,6 +15,7 @@ import { ContextProvider } from '../../../providers';
 import { ChangePasswordDto } from '../domains/dtos/change-password.dto';
 import { JwtService } from '@nestjs/jwt';
 import { PatchAPIResponseDto } from '../domains/dtos/patch-api-response.dto';
+import { UserProfileDto } from '../domains/dtos/user-profile.dto';
 
 @Injectable()
 export class UserService {
@@ -124,5 +125,13 @@ export class UserService {
       this.userRepository.save(userEntity);
       return { message: 'Change password successfully!' };
     }
+  }
+
+  async updateProfile(
+    updateProfileDto: UserProfileDto,
+  ): Promise<PatchAPIResponseDto> {
+    const user = ContextProvider.getAuthUser();
+    await this.userRepository.update({ id: user.id }, updateProfileDto);
+    return { message: 'Update profile successfully!' };
   }
 }
